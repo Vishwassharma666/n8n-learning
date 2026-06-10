@@ -1,0 +1,31 @@
+name: Environment Deployment
+
+on:
+  push:
+    branches:
+      - staging
+      - main
+
+jobs:
+
+  deploy-staging:
+    if: github.ref == 'refs/heads/staging'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy To Staging
+        run: |
+          echo "================================="
+          echo "Deploying n8n workflows to STAGING"
+          echo "================================="
+
+  deploy-production:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy To Production
+        run: |
+          echo "================================="
+          echo "Deploying n8n workflows to PRODUCTION"
+          echo "================================="
