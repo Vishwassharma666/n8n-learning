@@ -5,3 +5,4 @@ Learning:
 - GitHub Actions
 - CI/CD
 - n8n
+- Learning GitHub Actions
