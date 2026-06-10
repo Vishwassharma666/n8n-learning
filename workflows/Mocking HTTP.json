@@ -1,0 +1,111 @@
+{
+  "name": "Mocking HTTP",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "mock/payment",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "521811bd-9268-45b3-b256-87f1463a6735",
+      "name": "Webhook",
+      "webhookId": "0760f29c-fb2c-4046-9e12-2b7a9a9fe2c9"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || {};\n\nconst mockResponse = {\n  status: \"success\",\n  transaction_id: \"MOCK-\" + Date.now(),\n  amount: body.amount || 0,\n  currency: body.currency || \"USD\",\n  timestamp: new Date().toISOString(),\n  mocked: true\n};\n\nreturn [{ json: mockResponse }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "a16badf7-7f98-45ad-b27e-125cebd80ade",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { appendFileSync } = require('fs');\nconst d = $input.first().json;\n\nconst line = `${d.timestamp} | ${d.transaction_id} | amount: ${d.amount}\\n`;\nappendFileSync('C:\\\\myapp\\\\mock-log.txt', line);\n\nreturn [{ json: d }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "ab4a7946-7aa5-4130-bdbd-594b548a66ad",
+      "name": "Code in JavaScript1"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ $json }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.5,
+      "position": [
+        624,
+        0
+      ],
+      "id": "88affe2c-093f-413f-a497-82a7b9c60f22",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript1": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "dfbb7f35-f127-4036-927e-8644ac65ba90",
+  "meta": {
+    "instanceId": "9aa3b8ee839e828108905f2df7a4fa3232b5bf4159860182d18df3b3c5c7d626"
+  },
+  "id": "v2uT4Kmp70dhkf48",
+  "tags": []
+}
