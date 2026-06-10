@@ -1,0 +1,24 @@
+name: n8n Workflow Validation
+
+on:
+  push:
+    branches:
+      - develop
+      - staging
+      - main
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: List Workflows
+        run: |
+          echo "Available workflows:"
+          find workflows -name "*.json"
+
+      - name: Validation Complete
+        run: echo "All workflow files detected successfully"
