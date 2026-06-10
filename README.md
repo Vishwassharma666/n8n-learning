@@ -1,2 +1,7 @@
-# n8n-learning
-Learning GitHub, CI/CD and n8n workflows
+## My GitHub Learning Journey
+
+Learning:
+- GitHub
+- GitHub Actions
+- CI/CD
+- n8n
