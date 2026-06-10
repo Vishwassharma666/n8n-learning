@@ -1,0 +1,167 @@
+{
+  "name": "Jest Unit Testing Local",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "5c7efa6d-2911-4aa6-991f-50e375ad1372",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "12019ecd-78a1-4d76-9c18-ff8acec94a55",
+              "leftValue": "={{ $json.success }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "50193e9d-2575-43fd-b55a-0fc8fc2621d0",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { appendFileSync } = require('fs');\nconst d = $input.first().json;\nappendFileSync('C:\\\\myapp\\\\jest-log.txt',\n  `FAILED | ${d.timestamp} | ${d.numFailed} failed\\n`\n);\nreturn [{ json: { status: 'FAILED', failed: d.numFailed } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        96
+      ],
+      "id": "22065f10-8035-4890-8fa2-cf394f2a03a3",
+      "name": "FAIL"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { appendFileSync } = require('fs');\nconst d = $input.first().json;\nappendFileSync('C:\\\\myapp\\\\jest-log.txt',\n  `PASSED | ${d.timestamp} | ${d.numPassed} passed\\n`\n);\nreturn [{ json: { status: 'PASSED', passed: d.numPassed } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        832,
+        -96
+      ],
+      "id": "b54ab682-af97-4369-a7e8-b021d9b23382",
+      "name": "PASS"
+    },
+    {
+      "parameters": {
+        "jsCode": "const result = JSON.parse($input.first().json.stdout);\nreturn [{ json: {\n  success: result.success,\n  numPassed: result.numPassedTests || 0,\n  numFailed: result.numFailedTests || 0,\n  timestamp: new Date().toISOString()\n}}];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "a2649f99-5a6a-4607-b6a1-63caca03ff61",
+      "name": "Parse Output"
+    },
+    {
+      "parameters": {
+        "jsCode": "const { execSync } = require('child_process');\nlet stdout = '';\ntry {\n  stdout = execSync(\n    'cd C:\\\\myapp && npx jest --json 2>nul',\n    { encoding: 'utf8', timeout: 60000 }\n  );\n} catch (e) {\n  stdout = e.stdout || '';\n}\nreturn [{ json: { stdout } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        208,
+        0
+      ],
+      "id": "af73a42d-50e9-404a-8c7e-8958c54198a8",
+      "name": "Run Jest"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Run Jest",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "PASS",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "FAIL",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Parse Output": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Run Jest": {
+      "main": [
+        [
+          {
+            "node": "Parse Output",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "01851fae-c791-49e5-bded-e0e62dcfadab",
+  "meta": {
+    "instanceId": "9aa3b8ee839e828108905f2df7a4fa3232b5bf4159860182d18df3b3c5c7d626"
+  },
+  "id": "XShsVh4V6inG8xzL",
+  "tags": []
+}
